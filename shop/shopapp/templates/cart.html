@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3 class="text-center mt-5 mb-5 text-white">Ваша корзина {% if not cart.products.count %}{% endif %} </h3>
+{% if messages %}
+    {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>{{ message}}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+             <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+    {% endfor %}
+{% endif %}
+<table class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="col">Наименование</th>
+      <th scope="col">Изображение</th>
+      <th scope="col">Цена</th>
+      <th scope="col">Количество</th>
+      <th scope="col">Общая сумма</th>
+      <th scope="col">Делаем</th>
+    </tr>
+  </thead>
+  <tbody>
+      {% for item in cart.products.all %}
+        <tr>
+          <th scope="row">{{ item.product.title}}</th>
+          <td class="w-20"><img src="{{ item.product.image.url }}"class="img-fluid"></td>
+          <td>{{item.product.price}} рублей</td>
+          <td><form action="{% url 'change_qty' slug=item.product.slug %}" method="POST">{% csrf_token %}<input type="number" class="form-control" name="qty" style="width: 50px" min="1" value="{{ item.qty }}"><br><input type="submit" class="btn btn-primary" value="Изменить количество"></form> </td>
+          <td>{{item.final_price}} рублей</td>
+          <td>
+            <a href="{% url 'delete_from_cart' slug=item.product.slug %}"><button class="btn btn-danger">Удалить товар</button></a>
+          </td>
+        </tr>
+      {% endfor %}
+        <tr>
+          <td colspan="2"></td>
+          <td>Итог:</td>
+          <td>{{ cart.total_products }}</td>
+          <td><strong>{{ cart.final_price }} рублей.</strong></td>
+          <td><a href="{% url 'zakaz' %}"><button class="btn btn-primary">Оформление заказа</button></a></td>
+        </tr>
+  </tbody>
+</table>
+{% endblock content %}
+
